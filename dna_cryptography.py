@@ -162,25 +162,26 @@ def stego_analysis(image, book, chapter, verse):
     message = decrypt(message, book)
     print("Bits Processed: " + str(counter))
     return message
+def test_driver():
+    book = "Leviticus"
+    message = "You're not supposed to see it in the image"
+    message +="\n"
+    chapter, verse = 17, 14
 
-book = "Leviticus"
-message = "You're not supposed to see it in the image"
-message +="\n"
-chapter, verse = 17, 14
+    # read the image
+    filepath = "C:\\Users\\anthony.clemente\\Downloads\\april2022.jpg"
+    image = Image.open(filepath)
+    old_pixels = image.load()
+    new_image = stego_hiding(image, message,book,chapter, verse)
+    image.show()
+    new_image.show()
+    if(new_image is False):
+        print("Message is too large to encrypt")
+    else:
+        message = stego_analysis(new_image, book, chapter, verse)
+    print(message)
 
-# read the image
-filepath = "C:\\Users\\anthony.clemente\\Downloads\\april2022.jpg"
-image = Image.open(filepath)
-old_pixels = image.load()
-new_image = stego_hiding(image, message,book,chapter, verse)
-image.show()
-new_image.show()
-if(new_image is False):
-    print("Message is too large to encrypt")
-else:
-    message = stego_analysis(new_image, book, chapter, verse)
-print(message)
-
+test_driver()
 # new_image.show()
 """ 
 diff = ImageChops.difference(image, new_image)
