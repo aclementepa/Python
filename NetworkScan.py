@@ -14,19 +14,12 @@ def InstallUpdates(address):
     host = address
     port = 22
     username = "python.scanner"
-    password = "H0w@rd*S0l0"
+    password = "password"
     command = "powershell Get-WindowsUpdate -install -acceptall -IgnoreReboot"
 
-    # powershell install-module PsWindowsUpdate -AcceptLicense -AllowClobber -Force
-    # powershell Set-ExecutionPolicy -Scope LocalMachine Bypass
-    # powershell import-module PSWindowsUpdate
-    # powershell Enable-PSRemoting
-    # powershell Set-Item wsman:\localhost\client\trustedhosts HOWARD-48 -orce
-    # powershell Restart-Service WinRM
-    # powershell Set-ExecutionPolicy -Scope LocalMachine Restricted
 
-    login_credentials = "anthony.clemente@" + host
-    p = subprocess.Popen(["cmd.exe", "ssh anthony.clemente@"])
+    login_credentials = "test.user@" + host
+    p = subprocess.Popen(["cmd.exe", "ssh test.user@"])
     p = subprocess.Popen(["powershell.exe", "Get-WindowsUpdate -install -acceptall -IgnoreReboot"], stdout=sys.stdout)
     p.communicate()
 def RemoteCommands(address):
@@ -35,7 +28,7 @@ def RemoteCommands(address):
     try:
         port = 22
         username = "python.scanner"
-        password = "H0w@rd*S0l0"
+        password = "password"
         policy_update = "gpupdate /force"
         sfc_scan = "sfc /scannow"
         output = []
@@ -57,25 +50,17 @@ def RemoteCommands(address):
     except(error):
         output.append(address + ": Error " + error + "\n")
     return output
-    # login_credentials = username + host
-    # p = subprocess.Popen(["cmd.exe", "ssh anthony.clemente@"])
-    # p = subprocess.Popen(["powershell.exe", "Get-WindowsUpdate -install -acceptall -IgnoreReboot"], stdout=sys.stdout)
-    # p.communicate()
 def ScanNetwork():
     results = ["Results for Network Scan"]
     addresses = []
-    # totalPings = 255-50
     for ping in range(51,255):
-        # percentComplete = str(round(ping / totalPings)) + "%"
-        # print(percentComplete)
         address = "192.168.100." + str(ping)
         res = subprocess.call(['ping', address])
-        # res = subprocess.call(['ping', address], stdout=subprocess.PIPE, stderr=subprocess.PIPE)        Quiet Mode
         try:
             host = socket.gethostbyaddr(address)
             temp = str(host[0]) + " (" + str(host[2]) + ")"
-            if ("HOWARD") in temp:
-                if("CLOVIS" or "DESKTOP" or "ITHIL" or "ZEFFO" or "EPSON" or "HP" or "ISIGNS"or "BROTHER" or None) in temp:
+            if ("COMP") in temp:
+                if("SERVER" or "DESKTOP" or None) in temp:
                     addresses.append(address)
             else:
                 # remove unwanted devices
@@ -86,7 +71,6 @@ def ScanNetwork():
         if res == 0:
             res = ""
         else:
-            # RemoveDHCPResult = subprocess.call(BuildRemoveDHCPCommand(address))
             if res == 1:
                 results.append("Failed ping to " + temp)
             if res == 2:
@@ -99,7 +83,7 @@ def WriteResultstoFile(results, filepath):
         f.write(result + "\n")
 def SendEmail(sender, receiver, body, subject, filepath):
         
-    smtp_server = "mail.howardindustries.com"
+    smtp_server = "mail.server.com"
     port = 587  # For starttls
 
     message = MIMEMultipart()
@@ -127,15 +111,15 @@ def SendEmail(sender, receiver, body, subject, filepath):
 
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("mail.howardindustries.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL("mail.server.com", 465, context=context) as server:
         server.login(sender, password)
         server.sendmail(sender, receiver, text)
 
 def BuildRemoveDHCPCommand(ipAddress):
-    return("powershell.exe Remove-DhcpServerv4Lease -ComputerName 'telperion.howardindustries.local' -IPAddress " + ipAddress)
+    return("powershell.exe Remove-DhcpServerv4Lease -ComputerName 'computer.domain.local' -IPAddress " + ipAddress)
 
 def BuildRemoveDNSCommand(hostName, ipAddress):
-    return("powershell.exe Remove-DnsServerResourceRecord -ComputerName 'telperion.howardindustries.local' -ZoneName 'howardindustries.local' -Name '" + hostName + "' -RRType 'A' -RecordData '" + ipAddress  + "'")
+    return("powershell.exe Remove-DnsServerResourceRecord -ComputerName 'computer.domain.local' -ZoneName 'domain.local' -Name '" + hostName + "' -RRType 'A' -RecordData '" + ipAddress  + "'")
 
 def RemoveRecords(ipAddresses, hostName):
     for ip in ipAddresses:
@@ -168,6 +152,6 @@ subject = " Network Scan Results - " + str(date.today())
 body = "Results from the Network Scan of " + str(date.today()) +"\n\n"
 for res in scanResults:
     body += "\n" + res
-receiver_email = "anthonyc@howardindustries.com"
+receiver_email = "anthonyc@server.com"
 # body += "\nThese IP Addresses have been deleted from the domain."
 SendEmail(sender, receiver_email, body, subject, filepath)

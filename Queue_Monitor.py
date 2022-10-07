@@ -45,7 +45,7 @@ def Send_Email(sender, recipient, body, subject, filepath):
 
     # Log in to server using secure context and send email
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL("mail.howardindustries.com", 465, context=context) as server:
+    with smtplib.SMTP_SSL("mail.website.com", 465, context=context) as server:
         server.login(sender, "h!si9ns*dms")
         server.sendmail(sender, recipient, text)
 
@@ -105,6 +105,6 @@ if len(logs) > 0:
     body = "Results from the Print Queue Monitor " + str(date.today()) +"\n\n"
     for log in logs:
         body += "\n" + log
-    sender = "dms@howardindustries.com"
-    recipient_email = "mis@howardindustries.com"
+    sender = "user@website.com"
+    recipient_email = "user@website.com"
     Send_Email(sender, recipient_email, body, subject, filepath)
